@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularz rezerwacji hotelu</title>
+    <script>
+        // Funkcja do dynamicznego dodawania pól dla osób
+        function addGuestFields() {
+            var numberOfGuests = document.getElementById("number_of_guests").value;
+            var guestFieldsContainer = document.getElementById("guest_fields_container");
+            guestFieldsContainer.innerHTML = ""; // Wyczyszczenie kontenera
+
+            for (var i = 1; i <= numberOfGuests; i++) {
+                var guestFields = `
+                    <h3>Dane osoby ${i}</h3>
+                    <label for="guest_${i}_name">Imię:</label>
+                    <input type="text" name="guest_${i}_name" id="guest_${i}_name" required><br><br>
+                    <label for="guest_${i}_last_name">Nazwisko:</label>
+                    <input type="text" name="guest_${i}_last_name" id="guest_${i}_last_name" required><br><br>
+                    <label for="guest_${i}_email">E-mail:</label>
+                    <input type="email" name="guest_${i}_email" id="guest_${i}_email" required><br><br>
+                    <hr>
+                `;
+                guestFieldsContainer.innerHTML += guestFields;
+            }
+        }
+    </script>
+</head>
+<body onload="loadFormState()">
+<h2>Formularz rezerwacji hotelu</h2>
+<form id="reservation_form" action="process_reservation.php" method="post">
+    <label for="number_of_guests">Liczba osób:</label>
+    <select name="number_of_guests" id="number_of_guests" onchange="addGuestFields()" required>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+    </select><br><br>
+
+    <!-- Kontener dla pól dla poszczególnych osób -->
+    <div id="guest_fields_container"></div>
+
+    <label for="arrival_date">Data przyjazdu:</label>
+    <input type="date" name="arrival_date" id="arrival_date" required><br><br>
+
+    <label for="departure_date">Data wyjazdu:</label>
+    <input type="date" name="departure_date" id="departure_date" required><br><br>
+
+    <label for="arrival_time">Godzina przyjazdu:</label>
+    <input type="time" name="arrival_time" id="arrival_time" required><br><br>
+
+    <label for="child_bed">Dostawka dla dziecka:</label>
+    <input type="checkbox" name="child_bed" id="child_bed"><br><br>
+
+    <label for="amenities">Udogodnienia:</label><br>
+    <input type="checkbox" name="amenities[]" value="klimatyzacja"> Klimatyzacja<br>
+    <input type="checkbox" name="amenities[]" value="popielniczka"> Popielniczka dla palacza<br><br>
+
+    <input type="submit" value="Zarezerwuj">
+
+
+</form>
+
+<script>
+    // Funkcja do zapisywania stanu formularza do ciasteczka
+    function saveFormState() {
+        var formFields = document.getElementById("reservation_form").elements;
+        var formData = {};
+        for (var i = 0; i < formFields.length; i++) {
+            if (formFields[i].type !== "submit") {
+                formData[formFields[i].name] = formFields[i].value;
+            }
+        }
+        document.cookie = "formState=" + JSON.stringify(formData) + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
+    }
+
+    // Funkcja do wczytywania stanu formularza z ciasteczka
+    function loadFormState() {
+        var cookieData = document.cookie.replace(/(?:(?:^|.*;\s*)formState\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+        if (cookieData) {
+            var formData = JSON.parse(cookieData);
+            var formFields = document.getElementById("reservation_form").elements;
+            for (var i = 0; i < formFields.length; i++) {
+                if (formData.hasOwnProperty(formFields[i].name)) {
+                    formFields[i].value = formData[formFields[i].name];
+                }
+            }
+        }
+    }
+
+    // Funkcja do czyszczenia formularza i usuwania ciasteczka
+    function clearForm() {
+        document.getElementById("reservation_form").reset();
+        document.cookie = "formState=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+</script>
+
+</body>
+</html>

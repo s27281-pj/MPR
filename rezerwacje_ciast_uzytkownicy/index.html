@@ -1,0 +1,37 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    echo "<p>Nie masz dostępu do tej części strony. Aby móc dokonać rezerwacji, musisz się zalogować.</p>";
+exit;  // Zakończenie dalszego ładowania strony
+} else if (isset($_COOKIE["username"])) {
+echo "<p>Witaj, " . htmlspecialchars($_COOKIE["username"]) . "!</p>";
+}
+
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+echo "<p>Nie masz dostępu do tej części strony, ponieważ nie jesteś zalogowany. Zaloguj się, aby kontynuować.</p>";
+// Możesz również tutaj umieścić link do strony logowania
+echo "<a href='login.html/login.php'>Logowanie</a>";
+exit;
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularz rezerwacji hotelu</title>
+    <!-- Załącz pliki JavaScript i CSS -->
+</head>
+<body>
+<h2>Login to Access Reservation</h2>
+<form action="login.html/login.php" method="post">
+    <label for="username">Username:</label>
+    <input type="text" name="username" id="username" required><br><br>
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password" required><br><br>
+    <input type="submit" value="Login">
+</form>
+</body>
+</html>
