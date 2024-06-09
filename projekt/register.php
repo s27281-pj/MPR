@@ -99,7 +99,24 @@ if(isset($_POST['register_button'])){
         array_push($error_array, "Hasło musi mieć więcej niż 5 znaków<br>");
     }
 
-//    || strlen($password) < 5
+    if(empty(@$error_array)) {
+        $password = md5($password); //Haszowanie hasła przed wysłaniem hasła do bazy danych
+
+        //Generowanie nazwy użytkownika
+        $username = strtolower($fname . "_". $lname);
+        $check_username_query = mysqli_query($con, "SELECT username FROM users WHERE username='$username'");
+
+        $i = 0;
+        //jeżeli nazwa użytkownika nie jest unikalna, dodaje kolejny numer do nazwy użytkownika.
+        while(mysqli_num_rows($check_username_query) !=0 ) {
+            $i++; //kolejna liczba
+            $username = $username . "_" . $i;
+            $check_username_query = mysqli_query($con, "SELECT username FROM users WHERE username='$username'");
+
+        }
+
+    }
+
 
 }
 
