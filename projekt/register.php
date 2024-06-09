@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 $con = mysqli_connect("localhost","root","","social");
 
 if (mysqli_connect_errno()) {
@@ -14,7 +14,7 @@ $em2 = ""; //email 2
 $password = ""; //password
 $password2 = ""; //password 2
 $date =""; //data rejestracji
-$error_array = ""; //zatrzymuje komunikaty o błędach
+$error_array = array(); //zatrzymuje komunikaty o błędach
 
 if(isset($_POST['register_button'])){
 
@@ -22,21 +22,28 @@ if(isset($_POST['register_button'])){
     $fname = strip_tags($_POST['reg_fname']); //usówa tagi HTML
     $fname = str_replace(' ','', $fname); //usówa błędnie dodane spacje
     $fname = ucfirst(strtolower($fname)); //pierwsza litera zawsze wielka, pozostałę zawsze małe
+    $_SESSION['reg_fname'] = $fname; //trzyma zmienne
 
     //Nazwisko
     $lname = strip_tags($_POST['reg_lname']); //usówa tagi HTML
     $lname = str_replace(' ','', $lname); //usówa błędnie dodane spacje
     $lname = ucfirst(strtolower($lname)); //pierwsza litera zawsze wielka, pozostałę zawsze małe
+    $_SESSION['reg_lname'] = $lname; //trzyma zmienne
+
 
     //Email
     $em = strip_tags($_POST['reg_email']); //usówa tagi HTML
     $em = str_replace(' ','', $em); //usówa błędnie dodane spacje
     $em = ucfirst(strtolower($em)); //pierwsza litera zawsze wielka, pozostałę zawsze małe
+    $_SESSION['reg_email'] = $em; //trzyma zmienne
+
 
     //Email 2
     $em2 = strip_tags($_POST['reg_email2']); //usówa tagi HTML
     $em2 = str_replace(' ','', $em2); //usówa błędnie dodane spacje
     $em2 = ucfirst(strtolower($em2)); //pierwsza litera zawsze wielka, pozostałę zawsze małe
+    $_SESSION['reg_email2'] = $em2; //trzyma zmienne
+
 
     //Hasło
     $password = strip_tags($_POST['reg_password']); //usówa tagi HTML
@@ -58,38 +65,38 @@ if(isset($_POST['register_button'])){
             //Zliczamy ilość wierszy w odpowiedzi na zapytanie
             $num_rows = mysqli_num_rows($e_check);
             if($num_rows > 0 ) {
-                echo "Email już znajduje się w bazie";
+                array_push($error_array, "Email już znajduje się w bazie<br>");
             }
         }
         else {
-            echo "błędny format emaila";
+            array_push($error_array, "błędny format emaila<br>");
         }
     }
     else {
-        echo "Podano różne hasła";
+        array_push($error_array, "Podano różne emaile<br>");
     }
 
     if(strlen($fname) > 25 || strlen($fname) < 2 ) {
-        echo "Twoje imię musi zawierać się w przedziale 2 i 25 znaków.";
+        array_push($error_array, "Twoje imię musi zawierać się w przedziale 2 i 25 znaków.<br>");
     }
 
     if(strlen($lname) > 25 || strlen($lname) < 2 ) {
-        echo "Twoje nazwisko musi zawierać się w przedziale 2 i 25 znaków.";
+        array_push($error_array, "Twoje nazwisko musi zawierać się w przedziale 2 i 25 znaków.<br>");
     }
 
     if($password != $password2) {
-        echo "Wprowadzono różne hasła";
+        array_push($error_array, "Wprowadzono różne hasła<br>");
     }
     else {
         if(preg_match('/[^A-Za-z0-9]/', $password)) {
-            echo "Hasło może zawierać jedynie międzynarodowe litery lub liczby";
+            array_push($error_array, "Hasło może zawierać jedynie międzynarodowe litery lub liczby<br>");
         }
     }
 
     if (strlen($password) > 30) {
-        echo "Hasło musi zawierać się pomiędzy 5 i 30 znakami";
+        array_push($error_array, "Hasło musi mieć mniej niż 30 znaków<br>");
     } elseif (strlen($password) < 5) {
-        echo "Hasło musi zawierać się pomiędzy 5 i 30 znakami";
+        array_push($error_array, "Hasło musi mieć więcej niż 5 znaków<br>");
     }
 
 //    || strlen($password) < 5
@@ -104,18 +111,60 @@ if(isset($_POST['register_button'])){
 </head>
 <body>
     <form action="register.php" method="post">
-        <input type="text" name="reg_fname" placeholder="First Name" required>
+        <input type="text" name="reg_fname" placeholder="First Name" value="<?php
+        if(isset($_SESSION['reg_fname'])) {
+            echo $_SESSION['reg_fname'];
+        }
+        ?>" required>
         <br>
-        <input type="text" name="reg_lname" placeholder="Last Name" required>
+        <?php if(in_array("Twoje imię musi zawierać się w przedziale 2 i 25 znaków.<br>", $error_array)) echo "Twoje imię musi zawierać się w przedziale 2 i 25 znaków.<br>"; ?>
+
+
+
+        <input type="text" name="reg_lname" placeholder="Last Name" value="<?php
+        if(isset($_SESSION['reg_lname'])) {
+            echo $_SESSION['reg_lname'];
+        }
+        ?>" required>
         <br>
-        <input type="email" name="reg_email" placeholder="Email" required>
+        <?php if(in_array("Twoje nazwisko musi zawierać się w przedziale 2 i 25 znaków.<br>", $error_array)) echo "Twoje nazwisko musi zawierać się w przedziale 2 i 25 znaków.<br>"; ?>
+
+
+
+        <input type="email" name="reg_email" placeholder="Email" value="<?php
+        if(isset($_SESSION['reg_email'])) {
+            echo $_SESSION['reg_email'];
+        }
+        ?>" required>
         <br>
-        <input type="email" name="reg_email2" placeholder="Confirm Email" required>
+        <?php if(in_array("Email już znajduje się w bazie<br>", $error_array)) echo "Email już znajduje się w bazie<br>";
+        else if(in_array("błędny format emaila<br>", $error_array)) echo "błędny format emaila<br>";
+        else if(in_array( "Podano różne emaile<br>", $error_array)) echo  "Podano różne emaile<br>"; ?>
+
+
+
+
+        <input type="email" name="reg_email2" placeholder="Confirm Email" value="<?php
+        if(isset($_SESSION['reg_email2'])) {
+            echo $_SESSION['reg_email2'];
+        }
+        ?>" required>
         <br>
+        <?php if(in_array("Email już znajduje się w bazie<br>", $error_array)) echo "Email już znajduje się w bazie<br>";
+        else if(in_array("błędny format emaila<br>", $error_array)) echo "błędny format emaila<br>";
+        else if(in_array( "Podano różne emaile<br>", $error_array)) echo  "Podano różne emaile<br>"; ?>
+
+
         <input type="password" name="reg_password" placeholder="Password" required>
         <br>
         <input type="password" name="reg_password2" placeholder="Confirm Password" required>
         <br>
+        <?php if(in_array("Wprowadzono różne hasła<br>", $error_array)) echo "Wprowadzono różne hasła<br>";
+        else if(in_array("Hasło może zawierać jedynie międzynarodowe litery lub liczby<br>", $error_array)) echo "Hasło może zawierać jedynie międzynarodowe litery lub liczby<br>";
+        else if(in_array( "Hasło musi mieć mniej niż 30 znaków<br>", $error_array)) echo  "Hasło musi mieć mniej niż 30 znaków<br>";
+        else if(in_array( "Hasło musi mieć więcej niż 5 znaków<br>", $error_array)) echo  "Hasło musi mieć więcej niż 5 znaków<br>"; ?>
+
+
         <input type="submit" name="register_button" value="Register">
 
 
