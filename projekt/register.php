@@ -112,8 +112,30 @@ if(isset($_POST['register_button'])){
             $i++; //kolejna liczba
             $username = $username . "_" . $i;
             $check_username_query = mysqli_query($con, "SELECT username FROM users WHERE username='$username'");
-
         }
+
+        //Przydzielenie zdjęcia profilowego
+        $rand = rand(1, 5); // Losowa liczba od 1 do 5. Potrzebujemy jej do wylosowania zdjęcia profilowego.
+
+        if($rand == 1) {
+            $profile_pic = "assets/images/profile_pics/defaults/blue_r.png";
+        } else if ($rand == 2) {
+            $profile_pic = "assets/images/profile_pics/defaults/green_r.png";
+        } else if ($rand == 3) {
+            $profile_pic = "assets/images/profile_pics/defaults/yellow_r.png";
+        } else if ($rand == 4) {
+            $profile_pic = "assets/images/profile_pics/defaults/red_r.png";
+        } else if ($rand == 5) {
+            $profile_pic = "assets/images/profile_pics/defaults/pink_r.png";
+        }
+
+        $query = mysqli_query($con, "INSERT INTO users VALUES ('', '$fname', '$lname', '$username', '$em', '$password', '$date', '$profile_pic', '0', '0', 'no', ',' )");
+        array_push($error_array, "<span style='color: darkred'>You're all set! Welcome into the tomb!</span><br>");
+        //Czyszczenie zmiennych sesji
+        $_SESSION['reg_fname'] = "";
+        $_SESSION['reg_lname'] = "";
+        $_SESSION['reg_email'] = "";
+        $_SESSION['reg_email2'] = "";
 
     }
 
@@ -184,8 +206,8 @@ if(isset($_POST['register_button'])){
 
         <input type="submit" name="register_button" value="Register">
 
-
-
+        <?php if(in_array("<span style='color: darkred'>You're all set! Welcome into the tomb!</span><br>", $error_array)) echo "<span style='color: darkred'>You're all set! Welcome into the tomb!</span><br>";
+        ?>
 
     </form>
 </body>
